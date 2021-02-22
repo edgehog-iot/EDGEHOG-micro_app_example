@@ -13,7 +13,8 @@
 #include <freertos/task.h>
 
 #define EDGEHOG_GPIO 32
-#define GPIO_EDGE_OUTPUT_PIN_SEL  (1ULL<<EDGEHOG_GPIO)
+#define POWER_OUT_ENABLE_GPIO 25
+#define GPIO_EDGE_OUTPUT_PIN_SEL  ((1ULL<<EDGEHOG_GPIO) | (1ULL<<POWER_OUT_ENABLE_GPIO))
 
 typedef void (*func_void_ptr)(void);
 
