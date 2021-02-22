@@ -1,5 +1,28 @@
-idf_component_register(INCLUDE_DIRS "include")
+set(dev_man_srcs "src/ehm_ulp.c")
 
-add_prebuilt_library(edgehog_micro "libedgehog_micro.a" REQUIRES nvs_flash mbedtls bt protocomm wifi_provisioning app_update mqtt json esp_https_ota driver protobuf-c)
+idf_component_register(INCLUDE_DIRS "include"
+                       SRCS "${dev_man_srcs}"
+                       REQUIRES ulp)
+
+add_prebuilt_library(edgehog_micro "libedgehog_micro.a" REQUIRES nvs_flash mbedtls bt protocomm wifi_provisioning app_update mqtt json esp_https_ota driver esp_adc_cal protobuf-c)
 
 target_link_libraries(${COMPONENT_LIB} INTERFACE edgehog_micro)
+
+#
+# ULP support additions to component CMakeLists.txt.
+#
+# 1. The ULP app name must be unique (if multiple components use ULP).
+set(ulp_app_name ulp_${COMPONENT_NAME})
+#
+# 2. Specify all assembly source files.
+#    Files should be placed into a separate directory (in this case, ulp/),
+#    which should not be added to COMPONENT_SRCS.
+set(ulp_s_sources "ulp/ds_monitor_ac.S")
+#
+# 3. List all the component source files which include automatically
+#    generated ULP export file, ${ulp_app_name}.h:
+set(ulp_exp_dep_srcs "src/ehm_ulp.c")
+#
+# 4. Call function to build ULP binary and embed in project using the argument
+#    values above.
+ulp_embed_binary(${ulp_app_name} "${ulp_s_sources}" "${ulp_exp_dep_srcs}")
